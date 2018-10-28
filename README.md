@@ -20,6 +20,9 @@ A step by step series of examples that tell you how to get a development env run
 
 Say what the step will be
 
+1. Install python 3.6
+   N.B (If on mac, make sure the certificates are up to date /Applications/Python\ 3.6/Install\ Certificates.command)
+
 ```
 Give the example
 ```
