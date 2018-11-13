@@ -1,8 +1,11 @@
 """ Miscellaneous auxiliary functions """
+import os
+
 from keras.datasets import mnist
+import matplotlib
+matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 import numpy
-
 
 # TODO mock function that creates a dummy feature vector
 def get_feature_vector():
@@ -40,6 +43,8 @@ def plot_mist(x, y, num_img, save_file_path=None):
         plt.yticks([])
 
     if save_file_path:
+        if not os.path.exists('plots'):
+            os.mkdir('plots')
         plt.savefig(save_file_path)
 
     plt.show()

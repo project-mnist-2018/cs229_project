@@ -1,6 +1,6 @@
 """ SoftMax MNIST classifier """
-from classifiers.utils.misc import get_real_mnist, plot_mist
-from classifiers.utils.preprocessing import preprocess_raw_mnist_data
+from utils.misc import get_real_mnist, plot_mist
+from utils.preprocessing import preprocess_raw_mnist_data
 import tensorflow as tf
 from tensorflow import keras
 
@@ -50,4 +50,4 @@ def main(plot=False):
 
 
 if __name__ == '__main__':
-    main()
+    main(True)
