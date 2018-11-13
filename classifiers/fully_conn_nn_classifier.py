@@ -3,7 +3,8 @@ from classifiers.utils.misc import get_real_mnist, plot_mist
 from classifiers.utils.preprocessing import preprocess_raw_mnist_data
 import tensorflow as tf
 from tensorflow import keras
-
+import matplotlib.pyplot as plt
+import numpy
 
 def fcnn_classifier():
     """ This function returns a Fully Connected NN keras classifier
@@ -36,7 +37,24 @@ def main(plot=False):
 
     # Train classifier
     print('\ntrain the classifier')
-    fcnn_clf.fit(x_train, y_train, epochs=5)
+    history = fcnn_clf.fit(x_train, y_train, epochs=5)
+
+    #Get data from history
+    print(history.history.keys())
+    plt.plot(history.history['acc'])
+    plt.title("model accuracy")
+    plt.ylabel('accuracy')
+    plt.xlabel('epoch')
+    plt.legend('train', loc='upper left')
+    plt.show()
+
+    #Plot the loss
+    plt.plot(history.history['loss'])
+    plt.title('model loss')
+    plt.ylabel('loss')
+    plt.xlabel('epoch')
+    plt.legend('train', loc='upper left')
+    plt.show()
 
     print('\ntest the classifier')
     test_loss, test_acc = fcnn_clf.evaluate(x_test, y_test)
