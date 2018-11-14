@@ -1,5 +1,5 @@
 """ SoftMax MNIST classifier """
-from utils.misc import get_real_mnist, plot_mist
+from utils.misc import get_real_mnist, get_gan_mnist, plot_mist
 from utils.preprocessing import preprocess_raw_mnist_data
 import tensorflow as tf
 from tensorflow import keras
@@ -26,6 +26,9 @@ def main(plot=False):
     # Get mnist train and test dataset
     (x_train, y_train), (x_test, y_test) = get_real_mnist()
 
+    # Get gan test dataset
+    # (x_train, y_train) = get_gan_mnist()
+
     # Preprocess raw data
     print('preprocess raw data')
     x_train = preprocess_raw_mnist_data(x_train)
@@ -50,4 +53,4 @@ def main(plot=False):
 
 
 if __name__ == '__main__':
-    main(True)
+    main(False)
