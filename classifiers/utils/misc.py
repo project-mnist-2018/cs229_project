@@ -18,10 +18,22 @@ def get_real_mnist():
     return (X_train, y_train), (X_test, y_test)
 
 
-# TODO create the function for importing the gan generated data manually labeled
-#      from data folder
 def get_gan_mnist():
-    pass
+    gan_samples = []
+    y = []
+    for file_name in sorted(os.listdir('data/gan_samples'), key=lambda f: int(f.split('_')[-1].split('.')[0])):
+        if 'npz' in file_name:
+            npz = numpy.load('data/gan_samples/%s' % file_name)
+            gan_samples.append(npz['x'])
+        else:
+            with open('data/gan_samples/%s' % file_name, 'r') as man_labels:
+                y += man_labels.readlines()
+    x = numpy.concatenate(gan_samples)
+
+    # TODO manually label the gan immages in x
+    y = y + ['?' for _ in range(len(x) - len(y))]
+
+    return x, y
 
 
 def plot_mist(x, y, num_img, save_file_path=None):
@@ -36,7 +48,7 @@ def plot_mist(x, y, num_img, save_file_path=None):
     size = numpy.ceil(numpy.sqrt(num_img))
     for i in range(num_img):
         plt.subplot(size, size, i + 1)
-        plt.tight_layout()
+        plt.tight_layout(h_pad=-0.1, pad=-0.2)
         plt.imshow(x[i], cmap='gray', interpolation='none')
         plt.title(y[i])
         plt.xticks([])
