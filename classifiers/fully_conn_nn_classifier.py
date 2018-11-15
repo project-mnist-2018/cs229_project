@@ -40,7 +40,7 @@ def main(plot=False, train=False):
     # Build classifier
     fcnn_clf = fcnn_classifier()
 
-    epochs = 5
+    epochs = 100
 
     if train:
         # Train classifier
@@ -60,7 +60,7 @@ def main(plot=False, train=False):
         plt.ylabel('accuracy')
         plt.xlabel('epoch')
         plt.legend(['train', 'test'], loc='upper left')
-        plt.savefig("output/model_accuracy.png")
+        plt.savefig("output/fully_connected_model_accuracy.png")
         plt.show()
         #Save the plot
 
@@ -71,7 +71,7 @@ def main(plot=False, train=False):
         plt.ylabel('loss')
         plt.xlabel('epoch')
         plt.legend(['train', 'test'], loc='upper left')
-        plt.savefig("output/model_loss.png")
+        plt.savefig("output/fully_connected_model_loss.png")
         plt.show()
     else:
         # Load the model weights
