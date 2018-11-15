@@ -27,7 +27,7 @@ def get_gan_mnist():
             gan_samples.append(npz['x'])
         else:
             with open('data/gan_samples/%s' % file_name, 'r') as man_labels:
-                y += man_labels.readlines()
+                y += [int(y) for y in man_labels.readlines()]
     x = numpy.concatenate(gan_samples)
 
     # TODO manually label the gan immages in x
