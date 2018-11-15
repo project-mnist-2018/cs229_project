@@ -3,6 +3,7 @@ from utils.misc import get_real_mnist, get_gan_mnist, plot_mist
 from utils.preprocessing import preprocess_raw_mnist_data
 import tensorflow as tf
 from tensorflow import keras
+import matplotlib.pyplot as plt
 
 
 def simple_soft_max_classifier():
@@ -21,7 +22,7 @@ def simple_soft_max_classifier():
     return classifier
 
 
-def main(plot=False, train=False):
+def main(plot=True, train=True):
     """ Main function """
     # Get mnist train and test dataset
     (x_train, y_train), (x_test, y_test) = get_real_mnist()
@@ -38,12 +39,30 @@ def main(plot=False, train=False):
     # Build classifier
     sm_clf = simple_soft_max_classifier()
 
-    epochs = 5
+    epochs = 100
 
     if train:
         # Train classifier
         print('\ntrain the classifier')
-        sm_clf.fit(x_train, y_train, epochs=epochs)
+        history = sm_clf.fit(x_train, y_train, epochs=epochs, validation_data=(x_test, y_test))
+        plt.plot(history.history['acc'])
+        plt.plot(history.history['val_acc'])
+        plt.title("model accuracy")
+        plt.ylabel('accuracy')
+        plt.xlabel('epoch')
+        plt.legend(['train', 'test'], loc='upper left')
+        plt.savefig("output/softmax_model_accuracy.png")
+        plt.show()
+
+         #Plot the loss
+        plt.plot(history.history['loss'])
+        plt.plot(history.history['val_loss'])
+        plt.title('model loss')
+        plt.ylabel('loss')
+        plt.xlabel('epoch')
+        plt.legend(['train', 'test'], loc='upper left')
+        plt.savefig("output/softmax_model_loss.png")
+        plt.show()
 
         # Save weights
         sm_clf.save_weights('weights/sm_clf_%s.h5' % epochs)
