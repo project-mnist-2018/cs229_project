@@ -23,7 +23,7 @@ def fcnn_classifier():
     return classifier
 
 
-def main(plot=False):
+def main(plot=False, train=False):
     """ Main function """
     # Get mnist train and test dataset
     (x_train, y_train), (x_test, y_test) = get_real_mnist()
@@ -40,31 +40,46 @@ def main(plot=False):
     # Build classifier
     fcnn_clf = fcnn_classifier()
 
-    # Train classifier
-    print('\ntrain the classifier')
-    history = fcnn_clf.fit(x_train, y_train, epochs=5, validation_data=(x_test, y_test))
+    epochs = 5
 
-    #Get data from history
-    print(history.history.keys())
-    plt.plot(history.history['acc'])
-    plt.plot(history.history['val_acc'])
-    plt.title("model accuracy")
-    plt.ylabel('accuracy')
-    plt.xlabel('epoch')
-    plt.legend(['train', 'test'], loc='upper left')
-    plt.savefig("classifiers/output/model_accuracy.png")
-    plt.show()
-    #Save the plot
+    if train:
+        # Train classifier
+        print('\ntrain the classifier')
 
-    #Plot the loss
-    plt.plot(history.history['loss'])
-    plt.plot(history.history['val_loss'])
-    plt.title('model loss')
-    plt.ylabel('loss')
-    plt.xlabel('epoch')
-    plt.legend(['train', 'test'], loc='upper left')
-    plt.savefig("classifiers/output/model_loss.png")
-    plt.show()
+        history = fcnn_clf.fit(x_train, y_train, epochs=epochs, validation_data=(x_test, y_test))
+
+        # Save weights
+        fcnn_clf.save_weights('weights/fcnn_clf_%s.h5' % epochs)
+
+
+        #Get data from history
+        print(history.history.keys())
+        plt.plot(history.history['acc'])
+        plt.plot(history.history['val_acc'])
+        plt.title("model accuracy")
+        plt.ylabel('accuracy')
+        plt.xlabel('epoch')
+        plt.legend(['train', 'test'], loc='upper left')
+        plt.savefig("output/model_accuracy.png")
+        plt.show()
+        #Save the plot
+
+        #Plot the loss
+        plt.plot(history.history['loss'])
+        plt.plot(history.history['val_loss'])
+        plt.title('model loss')
+        plt.ylabel('loss')
+        plt.xlabel('epoch')
+        plt.legend(['train', 'test'], loc='upper left')
+        plt.savefig("output/model_loss.png")
+        plt.show()
+    else:
+        # Load the model weights
+        import os
+        weights_file_path = os.path.abspath(os.path.join(os.curdir, 'weights/fcnn_clf_%s.h5' % epochs))
+        if not print(os.path.exists(weights_file_path)):
+            print("The weights file path specified does not exists: %s" % os.path.exists(weights_file_path))
+        fcnn_clf.load_weights(weights_file_path)
 
     print('\ntest the classifier')
     test_loss, test_acc = fcnn_clf.evaluate(x_test, y_test)
