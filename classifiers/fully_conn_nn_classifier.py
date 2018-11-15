@@ -37,23 +37,28 @@ def main(plot=False):
 
     # Train classifier
     print('\ntrain the classifier')
-    history = fcnn_clf.fit(x_train, y_train, epochs=5)
+    history = fcnn_clf.fit(x_train, y_train, epochs=5, validation_data=(x_test, y_test))
 
     #Get data from history
     print(history.history.keys())
     plt.plot(history.history['acc'])
+    plt.plot(history.history['val_acc'])
     plt.title("model accuracy")
     plt.ylabel('accuracy')
     plt.xlabel('epoch')
-    plt.legend('train', loc='upper left')
+    plt.legend(['train', 'test'], loc='upper left')
+    plt.savefig("classifiers/output/model_accuracy.png")
     plt.show()
+    #Save the plot
 
     #Plot the loss
     plt.plot(history.history['loss'])
+    plt.plot(history.history['val_loss'])
     plt.title('model loss')
     plt.ylabel('loss')
     plt.xlabel('epoch')
-    plt.legend('train', loc='upper left')
+    plt.legend(['train', 'test'], loc='upper left')
+    plt.savefig("classifiers/output/model_loss.png")
     plt.show()
 
     print('\ntest the classifier')
