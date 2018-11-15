@@ -21,7 +21,7 @@ def simple_soft_max_classifier():
     return classifier
 
 
-def main(plot=False):
+def main(plot=False, train=False):
     """ Main function """
     # Get mnist train and test dataset
     (x_train, y_train), (x_test, y_test) = get_real_mnist()
@@ -38,9 +38,23 @@ def main(plot=False):
     # Build classifier
     sm_clf = simple_soft_max_classifier()
 
-    # Train classifier
-    print('\ntrain the classifier')
-    sm_clf.fit(x_train, y_train, epochs=5)
+    epochs = 5
+
+    if train:
+        # Train classifier
+        print('\ntrain the classifier')
+        sm_clf.fit(x_train, y_train, epochs=epochs)
+
+        # Save weights
+        sm_clf.save_weights('weights/sm_clf_%s.h5' % epochs)
+
+    else:
+        # Load the model weights
+        import os
+        weights_file_path = os.path.abspath(os.path.join(os.curdir, 'weights/sm_clf_%s.h5' % epochs))
+        if not print(os.path.exists(weights_file_path)):
+            print("The weights file path specified does not exists: %s" % os.path.exists(weights_file_path))
+        sm_clf.load_weights(weights_file_path)
 
     print('\ntest the classifier on real mnist')
     test_loss, test_acc = sm_clf.evaluate(x_test, y_test)
