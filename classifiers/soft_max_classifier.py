@@ -37,62 +37,63 @@ def main(plot=True, train=True):
     x_gan_test = preprocess_raw_mnist_data(x_gan_test)
 
     # Build classifier
-    sm_clf = simple_soft_max_classifier()
+    # sm_clf = simple_soft_max_classifier()
 
-    epochs = 100
+    # epochs = 100
 
-    if train:
-        # Train classifier
-        print('\ntrain the classifier')
-        history = sm_clf.fit(x_train, y_train, epochs=epochs, validation_data=(x_test, y_test))
-        plt.plot(history.history['acc'])
-        plt.plot(history.history['val_acc'])
-        plt.title("model accuracy")
-        plt.ylabel('accuracy')
-        plt.xlabel('epoch')
-        plt.legend(['train', 'test'], loc='upper left')
-        plt.savefig("output/softmax_model_accuracy.png")
-        plt.show()
+    # if train:
+    #     # Train classifier
+    #     print('\ntrain the classifier')
+    #     history = sm_clf.fit(x_train, y_train, epochs=epochs, validation_data=(x_test, y_test))
+    #     plt.plot(history.history['acc'])
+    #     plt.plot(history.history['val_acc'])
+    #     plt.title("model accuracy")
+    #     plt.ylabel('accuracy')
+    #     plt.xlabel('epoch')
+    #     plt.legend(['train', 'test'], loc='upper left')
+    #     plt.savefig("output/softmax_model_accuracy.png")
+    #     plt.show()
 
-         #Plot the loss
-        plt.plot(history.history['loss'])
-        plt.plot(history.history['val_loss'])
-        plt.title('model loss')
-        plt.ylabel('loss')
-        plt.xlabel('epoch')
-        plt.legend(['train', 'test'], loc='upper left')
-        plt.savefig("output/softmax_model_loss.png")
-        plt.show()
+    #      #Plot the loss
+    #     plt.plot(history.history['loss'])
+    #     plt.plot(history.history['val_loss'])
+    #     plt.title('model loss')
+    #     plt.ylabel('loss')
+    #     plt.xlabel('epoch')
+    #     plt.legend(['train', 'test'], loc='upper left')
+    #     plt.savefig("output/softmax_model_loss.png")
+    #     plt.show()
 
-        # Save weights
-        sm_clf.save_weights('weights/sm_clf_%s.h5' % epochs)
+    #     # Save weights
+    #     sm_clf.save_weights('weights/sm_clf_%s.h5' % epochs)
 
-    else:
-        # Load the model weights
-        import os
-        weights_file_path = os.path.abspath(os.path.join(os.curdir, 'weights/sm_clf_%s.h5' % epochs))
-        if not print(os.path.exists(weights_file_path)):
-            print("The weights file path specified does not exists: %s" % os.path.exists(weights_file_path))
-        sm_clf.load_weights(weights_file_path)
+    # else:
+    #     # Load the model weights
+    #     import os
+    #     weights_file_path = os.path.abspath(os.path.join(os.curdir, 'weights/sm_clf_%s.h5' % epochs))
+    #     if not print(os.path.exists(weights_file_path)):
+    #         print("The weights file path specified does not exists: %s" % os.path.exists(weights_file_path))
+    #     sm_clf.load_weights(weights_file_path)
 
-    print('\ntest the classifier on real mnist')
-    test_loss, test_acc = sm_clf.evaluate(x_test, y_test)
+    # print('\ntest the classifier on real mnist')
+    # test_loss, test_acc = sm_clf.evaluate(x_test, y_test)
 
-    print('\n#######################################')
-    print('Test loss real:', test_loss)
-    print('Test accuracy real:', test_acc)
+    # print('\n#######################################')
+    # print('Test loss real:', test_loss)
+    # print('Test accuracy real:', test_acc)
 
-    print('\ntest the classifier on gan mnist')
-    test_loss, test_acc = sm_clf.evaluate(x_gan_test[:100], y_gan_test[:100])
+    # print('\ntest the classifier on gan mnist')
+    # test_loss, test_acc = sm_clf.evaluate(x_gan_test[:100], y_gan_test[:100])
 
-    print('\n#######################################')
-    print('Test loss gan:', test_loss)
-    print('Test accuracy gan:', test_acc)
+    # print('\n#######################################')
+    # print('Test loss gan:', test_loss)
+    # print('Test accuracy gan:', test_acc)
 
     if plot:
         # plot_mist(x_train, y_train, 9, save_file_path='plots/test.png')
-        plot_mist(x_test, y_test, 36, save_file_path='plots/test.png')
+        #plot_mist(x_test, y_test, 36, save_file_path='plots/test.png')
+        plot_mist(x_gan_test[704:], y_gan_test[704:], 64, save_file_path='plots/testMINST.png')
 
 
 if __name__ == '__main__':
-    main(False)
+    main(True)
