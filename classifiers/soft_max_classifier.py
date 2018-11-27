@@ -92,7 +92,8 @@ def main(plot=True, train=True):
     if plot:
         # plot_mist(x_train, y_train, 9, save_file_path='plots/test.png')
         plot_mist(x_test, y_test, 36, save_file_path='plots/test.png')
+        #plot_mist(x_gan_test[704:], y_gan_test[704:], 64, save_file_path='plots/testMINST.png')
 
 
 if __name__ == '__main__':
-    main(False)
+    main(True)
