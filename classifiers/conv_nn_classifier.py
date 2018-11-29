@@ -11,11 +11,13 @@ def cnn_classifier():
     :return:    keras untrained Convolutional NN soft_max classifier
     """
     classifier = keras.Sequential([
-        keras.layers.Conv2D(32, kernel_size=10,
+        keras.layers.Conv2D(32, kernel_size=5,
                             strides=1,
                             activation='relu',
                             input_shape=(28, 28, 1)),
+        keras.layers.MaxPool2D(pool_size=2),
         keras.layers.Flatten(),
+        keras.layers.Dense(128, activation=tf.nn.relu),
         keras.layers.Dense(10, activation=tf.nn.softmax)
     ])
 
@@ -44,7 +46,7 @@ def main(plot=False, train=False):
     # Build classifier
     cnn_clf = cnn_classifier()
 
-    epochs = 1
+    epochs = 5
 
     if train:
         # Train classifier
