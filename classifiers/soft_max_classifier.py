@@ -22,7 +22,7 @@ def simple_soft_max_classifier():
     return classifier
 
 
-def main(plot=True, train=True):
+def main(plot=False, train=False):
     """ Main function """
     # Get mnist train and test dataset
     (x_train, y_train), (x_test, y_test) = get_real_mnist()
@@ -76,14 +76,14 @@ def main(plot=True, train=True):
         sm_clf.load_weights(weights_file_path)
 
     print('\ntest the classifier on real mnist')
-    test_loss, test_acc = sm_clf.evaluate(x_test, y_test)
+    test_loss, test_acc = sm_clf.evaluate(x_test[:1000], y_test[:1000])
 
     print('\n#######################################')
     print('Test loss real:', test_loss)
     print('Test accuracy real:', test_acc)
 
     print('\ntest the classifier on gan mnist')
-    test_loss, test_acc = sm_clf.evaluate(x_gan_test[:100], y_gan_test[:100])
+    test_loss, test_acc = sm_clf.evaluate(x_gan_test[:1000], y_gan_test[:1000])
 
     print('\n#######################################')
     print('Test loss gan:', test_loss)
@@ -91,9 +91,9 @@ def main(plot=True, train=True):
 
     if plot:
         # plot_mist(x_train, y_train, 9, save_file_path='plots/test.png')
-        plot_mist(x_test, y_test, 36, save_file_path='plots/test.png')
-        #plot_mist(x_gan_test[704:], y_gan_test[704:], 64, save_file_path='plots/testMINST.png')
+        # plot_mist(x_test, y_test, 36, save_file_path='plots/test.png')
+        plot_mist(x_gan_test[0:], y_gan_test[0:], 64, save_file_path='plots/testMINST.png')
 
 
 if __name__ == '__main__':
-    main(True)
+    main()
