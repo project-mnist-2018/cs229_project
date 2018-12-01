@@ -16,6 +16,10 @@ def cnn_classifier():
                             activation='relu',
                             input_shape=(28, 28, 1)),
         keras.layers.MaxPool2D(pool_size=2),
+        keras.layers.Conv2D(32, kernel_size=5,
+                            strides=1,
+                            activation=None,
+                            input_shape=(12, 12, 1)),
         keras.layers.Flatten(),
         keras.layers.Dense(128, activation=tf.nn.relu),
         keras.layers.Dense(10, activation=tf.nn.softmax)
