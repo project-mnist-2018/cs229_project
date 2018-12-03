@@ -46,7 +46,8 @@ def main(plot=False, train=False):
         # Train classifier
         print('\ntrain the classifier')
 
-        history = fcnn_clf.fit(x_train, y_train, epochs=epochs, validation_data=(x_test, y_test))
+        #history = fcnn_clf.fit(x_train, y_train, epochs=epochs, validation_data=(x_test, y_test))
+        history = fcnn_clf.fit(x_train, y_train, epochs=epochs, validation_split=0.1)
 
         # Save weights
         fcnn_clf.save_weights('weights/fcnn_clf_%s.h5' % epochs)

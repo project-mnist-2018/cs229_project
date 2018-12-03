@@ -74,7 +74,7 @@ def main(plot=False, train=False):
         plt.ylabel('accuracy')
         plt.xlabel('epoch')
         plt.legend(['train', 'test'], loc='upper left')
-        plt.savefig("output/fully_connected_model_accuracy.png")
+        plt.savefig("output/conv_5layer_model_accuracy.png")
         plt.show()
         #Save the plot
 
@@ -85,13 +85,13 @@ def main(plot=False, train=False):
         plt.ylabel('loss')
         plt.xlabel('epoch')
         plt.legend(['train', 'test'], loc='upper left')
-        plt.savefig("output/fully_connected_model_loss.png")
+        plt.savefig("output/conv_5layer_model_loss.png")
         plt.show()
 
     else:
         # Load the model weights
         import os
-        weights_file_path = os.path.abspath(os.path.join(os.curdir, 'weights/cnn_clf_%s.h5' % epochs))
+        weights_file_path = os.path.abspath(os.path.join(os.curdir, 'weights/cnn_5layer_clf_%s.h5' % epochs))
         if not print(os.path.exists(weights_file_path)):
             print("The weights file path specified does not exists: %s" % os.path.exists(weights_file_path))
         cnn_clf.load_weights(weights_file_path)
