@@ -2,3 +2,4 @@ keras>=2.2.4
 tensorflow>=1.10.0
 matplotlib>=3.0.1
 numpy>=1.13.1
+keras-vis>=0.4.1

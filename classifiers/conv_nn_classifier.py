@@ -4,7 +4,10 @@ from utils.preprocessing import preprocess_raw_mnist_data
 import tensorflow as tf
 from tensorflow import keras
 import matplotlib.pyplot as plt
-
+from vis.visualization import visualize_saliency
+from vis.utils import utils
+from keras import activations
+import numpy as np
 
 def cnn_classifier():
     """ This function returns a Convolutional NN keras classifier
@@ -15,6 +18,10 @@ def cnn_classifier():
                             strides=1,
                             activation='relu',
                             input_shape=(28, 28, 1)),
+        keras.layers.Conv2D(64, kernel_size=5,
+                            strides=1,
+                            activation='relu',
+                            input_shape=(24, 24, 1)),
         keras.layers.MaxPool2D(pool_size=2),
         keras.layers.Flatten(),
         keras.layers.Dense(128, activation=tf.nn.relu),
@@ -52,12 +59,13 @@ def main(plot=False, train=False):
         # Train classifier
         print('\ntrain the classifier')
 
-        history = cnn_clf.fit(x_train, y_train, epochs=epochs, validation_data=(x_test, y_test))
+        #history = cnn_clf.fit(x_train, y_train, epochs=epochs, validation_data=(x_test, y_test))
+        history = cnn_clf.fit(x_train, y_train, epochs=epochs, validation_split=0.1)
 
         # Save weights
         cnn_clf.save_weights('weights/cnn_clf_%s.h5' % epochs)
 
-
+        #Plots train and validation datasets
         #Get data from history
         print(history.history.keys())
         plt.plot(history.history['acc'])
@@ -79,6 +87,7 @@ def main(plot=False, train=False):
         plt.legend(['train', 'test'], loc='upper left')
         plt.savefig("output/fully_connected_model_loss.png")
         plt.show()
+
     else:
         # Load the model weights
         import os
@@ -100,6 +109,18 @@ def main(plot=False, train=False):
     print('\n#######################################')
     print('Test loss gan:', test_loss)
     print('Test accuracy gan:', test_acc)
+
+
+    class_idx = 0
+    indices = np.where(y_test[:, class_idx] == 1.)[0]
+
+    # pick some random input from here.
+    idx = indices[0]
+
+    # Lets sanity check the picked image.
+    plt.rcParams['figure.figsize'] = (18, 6)
+
+    plt.imshow(x_test[idx][..., 0])
 
     if plot:
         plot_mist(x_train, y_train, 9, save_file_path='plots/test.png')

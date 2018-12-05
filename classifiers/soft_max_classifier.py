@@ -44,7 +44,8 @@ def main(plot=False, train=False):
     if train:
         # Train classifier
         print('\ntrain the classifier')
-        history = sm_clf.fit(x_train, y_train, epochs=epochs, validation_data=(x_test, y_test))
+        #history = sm_clf.fit(x_train, y_train, epochs=epochs, validation_data=(x_test, y_test))
+        history = sm_clf.fit(x_train, y_train, epochs=epochs, validation_split=0.1)
         plt.plot(history.history['acc'])
         plt.plot(history.history['val_acc'])
         plt.title("model accuracy")
