@@ -8,7 +8,7 @@ setup(
     long_description=open('README.md').read(),
     install_requires=[
         'keras>=2.2.4',
-        'tensorflow>=1.10.0',
+        'tensorflow==1.7.1',
         'matplotlib>=3.0.1',
         'numpy>=1.13.1',
     ]
