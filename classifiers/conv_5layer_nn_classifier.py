@@ -117,7 +117,7 @@ def plot_confusion_matrix(cm, classes,
     Normalization can be applied by setting `normalize=True`.
     """
     if normalize:
-        cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
+        cm = cm.astype('float') / cm.sum(axis=0)[:, np.newaxis]
         print("Normalized confusion matrix")
     else:
         print('Confusion matrix, without normalization')
@@ -221,7 +221,7 @@ def main(plot=False, train=False):
     #attention_visualization(cnn_clf, x_gan_test, y_gan_test, epochs, "synthetic")
 
     from sklearn.metrics import confusion_matrix
-    
+
     #Original predict returns 1 hot encoding, so use argmax instead
     y_pred = np.argmax(cnn_clf.predict(x_test), axis=1)
     #y_pred = tf.argmax(cnn_clf.predict(x_test), axis=1)
