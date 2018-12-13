@@ -44,14 +44,13 @@ def main(plot=False, train=False):
     if train:
         # Train classifier
         print('\ntrain the classifier')
-        #history = sm_clf.fit(x_train, y_train, epochs=epochs, validation_data=(x_test, y_test))
         history = sm_clf.fit(x_train, y_train, epochs=epochs, validation_split=0.1)
         plt.plot(history.history['acc'])
         plt.plot(history.history['val_acc'])
         plt.title("model accuracy")
         plt.ylabel('accuracy')
         plt.xlabel('epoch')
-        plt.legend(['train', 'test'], loc='upper left')
+        plt.legend(['train', 'val'], loc='upper left')
         plt.savefig("output/softmax_model_accuracy.png")
         plt.show()
 
@@ -61,7 +60,7 @@ def main(plot=False, train=False):
         plt.title('model loss')
         plt.ylabel('loss')
         plt.xlabel('epoch')
-        plt.legend(['train', 'test'], loc='upper left')
+        plt.legend(['train', 'val'], loc='upper left')
         plt.savefig("output/softmax_model_loss.png")
         plt.show()
 
@@ -91,9 +90,7 @@ def main(plot=False, train=False):
     print('Test accuracy gan:', test_acc)
 
     if plot:
-        # plot_mist(x_train, y_train, 9, save_file_path='plots/test.png')
-        # plot_mist(x_test, y_test, 36, save_file_path='plots/test.png')
-        plot_mist(x_gan_test[0:], y_gan_test[0:], 64, save_file_path='plots/testMINST.png')
+        plot_mist(x_test[0:36], y_test[0:36], 9, save_file_path='plots/testMINST.png')
 
 
 if __name__ == '__main__':

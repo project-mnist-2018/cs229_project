@@ -3,7 +3,7 @@ from distutils.core import setup
 setup(
     name='cs229_project',
     description='CS229 project How Real is Real?  comparison of gans and supervised-learning classifiers.',
-    version='0.1dev',
+    version='0.2dev',
     license='Creative Commons Attribution-Noncommercial-Share Alike license',
     long_description=open('README.md').read(),
     install_requires=[

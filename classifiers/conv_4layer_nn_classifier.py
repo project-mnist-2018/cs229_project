@@ -110,8 +110,9 @@ def attention_visualization(cnn_clf, x_test, y_test):
                 modifier = 'vanilla'
             ax[i+1].set_title(modifier)    
             ax[i+1].imshow(grads, cmap='jet')
-    
-        plt.savefig("output/attention_saliency/conv_4layer_multiple_modifiers_saliency_" + str(class_idx) + ".png")        
+
+        # TODO make sure that output folder structure is correct
+        plt.savefig("output/attention_saliency/conv_4layer_multiple_modifiers_saliency_" + str(class_idx) + ".png")
         plt.show()
 
     #Attention CAM visualization
@@ -128,7 +129,7 @@ def attention_visualization(cnn_clf, x_test, y_test):
                                   seed_input=x_test[idx], backprop_modifier=modifier)        
             if modifier is None:
                 modifier = 'vanilla'
-            ax[i+1].set_title(modifier)    
+            ax[i+1].set_title(modifier)
             ax[i+1].imshow(grads, cmap='jet')
         plt.savefig("output/attention_CAM/conv_4layer_multiple_modifiers_CAM_" + str(class_idx) + ".png")        
         plt.show()
@@ -155,7 +156,7 @@ def main(plot=False, train=False):
     # Build classifier
     cnn_clf = cnn_classifier()
 
-    epochs = 5
+    epochs = 50
 
     if train:
         # Train classifier
@@ -168,7 +169,7 @@ def main(plot=False, train=False):
         history = cnn_clf.fit(x_train, y_train, epochs=epochs, validation_split=0.1)
 
         # Save weights
-        cnn_clf.save_weights('weights/cnn_clf_%s.h5' % epochs)
+        cnn_clf.save_weights('weights/cnn_4layer_clf_%s.h5' % epochs)
 
         #Plots train and validation datasets
         #Get data from history
@@ -178,7 +179,7 @@ def main(plot=False, train=False):
         plt.title("model accuracy")
         plt.ylabel('accuracy')
         plt.xlabel('epoch')
-        plt.legend(['train', 'test'], loc='upper left')
+        plt.legend(['train', 'val'], loc='upper left')
         plt.savefig("output/conv_4layer_model_accuracy.png")
         plt.show()
         #Save the plot
@@ -189,7 +190,7 @@ def main(plot=False, train=False):
         plt.title('model loss')
         plt.ylabel('loss')
         plt.xlabel('epoch')
-        plt.legend(['train', 'test'], loc='upper left')
+        plt.legend(['train', 'val'], loc='upper left')
         plt.savefig("output/conv_4layer_model_loss.png")
         plt.show()
 
@@ -202,14 +203,14 @@ def main(plot=False, train=False):
         cnn_clf.load_weights(weights_file_path)
 
     print('\ntest the classifier')
-    test_loss, test_acc = cnn_clf.evaluate(x_test, y_test)
+    test_loss, test_acc = cnn_clf.evaluate(x_test[:1000], y_test[:1000])
 
     print('\n#######################################')
     print('Test loss:', test_loss)
     print('Test accuracy:', test_acc)
 
     print('\ntest the classifier on gan mnist')
-    test_loss, test_acc = cnn_clf.evaluate(x_gan_test[:100], y_gan_test[:100])
+    test_loss, test_acc = cnn_clf.evaluate(x_gan_test[:1000], y_gan_test[:1000])
 
     print('\n#######################################')
     print('Test loss gan:', test_loss)
@@ -222,4 +223,4 @@ def main(plot=False, train=False):
 
 
 if __name__ == '__main__':
-    main(train=True)
+    main(train=False)
