@@ -155,7 +155,7 @@ def main(plot=False, train=False):
     # Build classifier
     cnn_clf = cnn_classifier()
 
-    epochs = 5
+    epochs = 100
 
     if train:
         # Train classifier
@@ -168,7 +168,7 @@ def main(plot=False, train=False):
         history = cnn_clf.fit(x_train, y_train, epochs=epochs, validation_split=0.1)
 
         # Save weights
-        cnn_clf.save_weights('weights/cnn_clf_%s.h5' % epochs)
+        cnn_clf.save_weights('weights/cnn_clf_4layer_%s.h5' % epochs)
 
         #Plots train and validation datasets
         #Get data from history
@@ -196,7 +196,7 @@ def main(plot=False, train=False):
     else:
         # Load the model weights
         import os
-        weights_file_path = os.path.abspath(os.path.join(os.curdir, 'weights/cnn_4layer_clf_%s.h5' % epochs))
+        weights_file_path = os.path.abspath(os.path.join(os.curdir, 'weights/cnn_clf_4layer_%s.h5' % epochs))
         if not print(os.path.exists(weights_file_path)):
             print("The weights file path specified does not exists: %s" % os.path.exists(weights_file_path))
         cnn_clf.load_weights(weights_file_path)

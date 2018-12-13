@@ -23,7 +23,7 @@ def fcnn_classifier():
     return classifier
 
 
-def main(plot=False, train=False):
+def main(plot=False, train=True):
     """ Main function """
     # Get mnist train and test dataset
     (x_train, y_train), (x_test, y_test) = get_real_mnist()
@@ -60,7 +60,7 @@ def main(plot=False, train=False):
         plt.title("model accuracy")
         plt.ylabel('accuracy')
         plt.xlabel('epoch')
-        plt.legend(['train', 'test'], loc='upper left')
+        plt.legend(['train', 'val'], loc='upper left')
         plt.savefig("output/fully_connected_model_accuracy.png")
         plt.show()
         #Save the plot
@@ -71,7 +71,7 @@ def main(plot=False, train=False):
         plt.title('model loss')
         plt.ylabel('loss')
         plt.xlabel('epoch')
-        plt.legend(['train', 'test'], loc='upper left')
+        plt.legend(['train', 'val'], loc='upper left')
         plt.savefig("output/fully_connected_model_loss.png")
         plt.show()
     else:
@@ -83,14 +83,14 @@ def main(plot=False, train=False):
         fcnn_clf.load_weights(weights_file_path)
 
     print('\ntest the classifier')
-    test_loss, test_acc = fcnn_clf.evaluate(x_test, y_test)
+    test_loss, test_acc = fcnn_clf.evaluate(x_test[:1000], y_test[:1000])
 
     print('\n#######################################')
     print('Test loss:', test_loss)
     print('Test accuracy:', test_acc)
 
     print('\ntest the classifier on gan mnist')
-    test_loss, test_acc = fcnn_clf.evaluate(x_gan_test[:100], y_gan_test[:100])
+    test_loss, test_acc = fcnn_clf.evaluate(x_gan_test[:1000], y_gan_test[:1000])
 
     print('\n#######################################')
     print('Test loss gan:', test_loss)
