@@ -217,33 +217,46 @@ def main(plot=False, train=False):
     print('Test loss gan:', test_loss)
     print('Test accuracy gan:', test_acc)
 
-    #attention_visualization(cnn_clf, x_test, y_test, epochs, "real")
-    #attention_visualization(cnn_clf, x_gan_test, y_gan_test, epochs, "synthetic")
+    attention_visualization(cnn_clf, x_test[:1000], y_test[:1000], epochs, "real")
+    attention_visualization(cnn_clf, x_gan_test[:1000], y_gan_test[:1000], epochs, "synthetic")
 
     from sklearn.metrics import confusion_matrix
 
     #Original predict returns 1 hot encoding, so use argmax instead
-    y_pred = np.argmax(cnn_clf.predict(x_test), axis=1)
+    y_pred = np.argmax(cnn_clf.predict(x_test[:1000]), axis=1)
     #y_pred = tf.argmax(cnn_clf.predict(x_test), axis=1)
     #cm = tf.confusion_matrix(y_test, y_pred, num_classes=10)
     
     #sess = tf.Session()
     #with sess.as_default():
     #    print(sess.run(cm))
-    cm = confusion_matrix(y_test, y_pred)
+    cm = confusion_matrix(y_test[:1000], y_pred)
     class_names= [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+    y_gan_pred = np.argmax(cnn_clf.predict(x_gan_test[:1000]), axis=1)
+    gan_cm = confusion_matrix(y_gan_test[:1000], y_gan_pred)
 
     # Plot non-normalized confusion matrix
     plt.figure()
     plot_confusion_matrix(cm, classes=class_names,
-                          title='Confusion matrix, without normalization')
-    plt.savefig("output/confusion_matrix_cnn_5layer_epoch_" + str(epochs) + ".png")
+                          title='Confusion matrix real images, without normalization')
+    plt.savefig("output/confusion_matrix_real_cnn_5layer_epoch_" + str(epochs) + ".png")
+
+    plt.figure()
+    plot_confusion_matrix(gan_cm, classes=class_names,
+                          title='Confusion matrix synthetic images, without normalization')
+    plt.savefig("output/confusion_matrix_synthetic_cnn_5layer_epoch_" + str(epochs) + ".png")
 
     # Plot normalized confusion matrix
     plt.figure()
     plot_confusion_matrix(cm, classes=class_names, normalize=True,
-                          title='Normalized confusion matrix')
-    plt.savefig("output/confusion_matrix_normalized_cnn_5layer_epoch_" + str(epochs) + ".png")
+                          title='Normalized confusion matrix real images')
+    plt.savefig("output/confusion_matrix_real_normalized_cnn_5layer_epoch_" + str(epochs) + ".png")
+
+    plt.figure()
+    plot_confusion_matrix(gan_cm, classes=class_names, normalize=True,
+                          title='Normalized confusion matrix synthetic images')
+    plt.savefig("output/confusion_matrix_synthetic_normalized_cnn_5layer_epoch_" + str(epochs) + ".png")
 
     plt.show()
 
