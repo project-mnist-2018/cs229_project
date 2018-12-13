@@ -1,4 +1,5 @@
 """ Convolutional Neural Network MNIST classifier """
+import itertools
 from utils.misc import get_real_mnist, get_gan_mnist, plot_mist
 from utils.preprocessing import preprocess_raw_mnist_data
 import tensorflow as tf
@@ -39,7 +40,7 @@ def cnn_classifier():
     return classifier
 
 #Attention visualization
-def attention_visualization(cnn_clf, x_test, y_test):
+def attention_visualization(cnn_clf, x_test, y_test, epoch, img):
     #Visualizing saliency
     num_classes = 10
     y_test_cate = keras.utils.to_categorical(y_test, num_classes)
@@ -48,12 +49,6 @@ def attention_visualization(cnn_clf, x_test, y_test):
 
     # pick some random input from here.
     idx = indices[0]
-
-    # Lets sanity check the picked image.
-    # plt.rcParams['figure.figsize'] = (18, 6)
-    # plt.imshow(x_test[idx][..., 0])
-    # plt.savefig("output/conv_4layer_input.png")
-    # plt.show()
 
     # Utility to search for layer index by name. 
     # Alternatively we can specify this as -1 since it corresponds to the last layer.
@@ -64,21 +59,6 @@ def attention_visualization(cnn_clf, x_test, y_test):
     #Softmax is weird that way. It is the only activation that depends on other node output(s) in the layer
     cnn_clf.layers[layer_idx].activation = activations.linear
     model = utils.apply_modifications(cnn_clf)
-
-    #grads = visualize_saliency(model, layer_idx, filter_indices=class_idx, seed_input=x_test[idx])
-    # Plot with 'jet' colormap to visualize as a heatmap.
-    #plt.imshow(grads, cmap='jet')
-    #plt.savefig("output/conv_4layer_saliency.png")
-    #plt.show()
-
-    # for modifier in ['guided', 'relu']:
-    #     grads = visualize_saliency(model, layer_idx, filter_indices=class_idx,
-    #                                seed_input=x_test[idx], backprop_modifier=modifier)
-    #     plt.figure()
-    #     plt.title(modifier)
-    #     plt.imshow(grads, cmap='jet')
-    #     plt.savefig("output/conv_4layer_" + modifier + ".png")
-    #     plt.show()
 
     #Show negation
     grads = visualize_saliency(model, layer_idx, filter_indices=class_idx, seed_input=x_test[idx], 
@@ -103,7 +83,7 @@ def attention_visualization(cnn_clf, x_test, y_test):
             ax[i+1].set_title(modifier)    
             ax[i+1].imshow(grads, cmap='jet')
     
-        plt.savefig("output/attention_saliency/conv_5layer_multiple_modifiers_saliency_" + str(class_idx) + ".png")        
+        plt.savefig("output/attention_saliency/conv_5layer_" + img +"_epoch_" + str(epoch) + "_multiple_modifiers_saliency_" + str(class_idx) + ".png")        
         plt.show()
 
     #Attention CAM visualization
@@ -122,11 +102,45 @@ def attention_visualization(cnn_clf, x_test, y_test):
                 modifier = 'vanilla'
             ax[i+1].set_title(modifier)    
             ax[i+1].imshow(grads, cmap='jet')
-        plt.savefig("output/attention_CAM/conv_5layer_multiple_modifiers_CAM_" + str(class_idx) + ".png")        
+        plt.savefig("output/attention_CAM/conv_5layer_" + img + "_epoch_" + str(epoch) + "_multiple_modifiers_CAM_" + str(class_idx) + ".png")        
         plt.show()
 
     #model summary
     print(model.summary())
+
+def plot_confusion_matrix(cm, classes,
+                          normalize=False,
+                          title='Confusion matrix',
+                          cmap=plt.cm.Blues):
+    """
+    This function prints and plots the confusion matrix.
+    Normalization can be applied by setting `normalize=True`.
+    """
+    if normalize:
+        cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
+        print("Normalized confusion matrix")
+    else:
+        print('Confusion matrix, without normalization')
+
+    print(cm)
+
+    plt.imshow(cm, interpolation='nearest', cmap=cmap)
+    plt.title(title)
+    plt.colorbar()
+    tick_marks = np.arange(len(classes))
+    plt.xticks(tick_marks, classes, rotation=45)
+    plt.yticks(tick_marks, classes)
+
+    fmt = '.2f' if normalize else 'd'
+    thresh = cm.max() / 2.
+    for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
+        plt.text(j, i, format(cm[i, j], fmt),
+                 horizontalalignment="center",
+                 color="white" if cm[i, j] > thresh else "black")
+
+    plt.ylabel('True label')
+    plt.xlabel('Predicted label')
+    plt.tight_layout()
 
 def main(plot=False, train=False):
     """ Main function """
@@ -146,7 +160,7 @@ def main(plot=False, train=False):
     # Build classifier
     cnn_clf = cnn_classifier()
 
-    epochs = 5
+    epochs = 100
 
     if train:
         # Train classifier
@@ -156,7 +170,7 @@ def main(plot=False, train=False):
         history = cnn_clf.fit(x_train, y_train, epochs=epochs, validation_split=0.1)
 
         # Save weights
-        cnn_clf.save_weights('weights/cnn_clf_%s.h5' % epochs)
+        cnn_clf.save_weights('weights/cnn_clf_5layer_%s.h5' % epochs)
 
         #Plots train and validation datasets
         #Get data from history
@@ -166,8 +180,8 @@ def main(plot=False, train=False):
         plt.title("model accuracy")
         plt.ylabel('accuracy')
         plt.xlabel('epoch')
-        plt.legend(['train', 'test'], loc='upper left')
-        plt.savefig("output/conv_5layer_model_accuracy.png")
+        plt.legend(['train', 'val'], loc='upper left')
+        plt.savefig("output/conv_5layer_epoch_" + str(epochs) + "_model_accuracy.png")
         plt.show()
         #Save the plot
 
@@ -177,38 +191,65 @@ def main(plot=False, train=False):
         plt.title('model loss')
         plt.ylabel('loss')
         plt.xlabel('epoch')
-        plt.legend(['train', 'test'], loc='upper left')
-        plt.savefig("output/conv_5layer_model_loss.png")
+        plt.legend(['train', 'val'], loc='upper left')
+        plt.savefig("output/conv_5layer_epoch_" + str(epochs) + "model_loss.png")
         plt.show()
 
     else:
         # Load the model weights
         import os
-        weights_file_path = os.path.abspath(os.path.join(os.curdir, 'weights/cnn_5layer_clf_%s.h5' % epochs))
+        weights_file_path = os.path.abspath(os.path.join(os.curdir, 'weights/cnn_clf_5layer_%s.h5' % epochs))
         if not print(os.path.exists(weights_file_path)):
             print("The weights file path specified does not exists: %s" % os.path.exists(weights_file_path))
         cnn_clf.load_weights(weights_file_path)
 
     print('\ntest the classifier')
-    test_loss, test_acc = cnn_clf.evaluate(x_test, y_test)
+    test_loss, test_acc = cnn_clf.evaluate(x_test[:1000], y_test[:1000])
 
     print('\n#######################################')
     print('Test loss:', test_loss)
     print('Test accuracy:', test_acc)
 
     print('\ntest the classifier on gan mnist')
-    test_loss, test_acc = cnn_clf.evaluate(x_gan_test[:100], y_gan_test[:100])
+    test_loss, test_acc = cnn_clf.evaluate(x_gan_test[:1000], y_gan_test[:1000])
 
     print('\n#######################################')
     print('Test loss gan:', test_loss)
     print('Test accuracy gan:', test_acc)
 
-    attention_visualization(cnn_clf, x_test, y_test)
+    #attention_visualization(cnn_clf, x_test, y_test, epochs, "real")
+    #attention_visualization(cnn_clf, x_gan_test, y_gan_test, epochs, "synthetic")
 
+    from sklearn.metrics import confusion_matrix
+    
+    #Original predict returns 1 hot encoding, so use argmax instead
+    y_pred = np.argmax(cnn_clf.predict(x_test), axis=1)
+    #y_pred = tf.argmax(cnn_clf.predict(x_test), axis=1)
+    #cm = tf.confusion_matrix(y_test, y_pred, num_classes=10)
+    
+    #sess = tf.Session()
+    #with sess.as_default():
+    #    print(sess.run(cm))
+    cm = confusion_matrix(y_test, y_pred)
+    class_names= [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+    # Plot non-normalized confusion matrix
+    plt.figure()
+    plot_confusion_matrix(cm, classes=class_names,
+                          title='Confusion matrix, without normalization')
+    plt.savefig("output/confusion_matrix_cnn_5layer_epoch_" + str(epochs) + ".png")
+
+    # Plot normalized confusion matrix
+    plt.figure()
+    plot_confusion_matrix(cm, classes=class_names, normalize=True,
+                          title='Normalized confusion matrix')
+    plt.savefig("output/confusion_matrix_normalized_cnn_5layer_epoch_" + str(epochs) + ".png")
+
+    plt.show()
 
     if plot:
         plot_mist(x_train, y_train, 9, save_file_path='plots/test.png')
 
 
 if __name__ == '__main__':
-    main(train=True)
+    main(train=False)
