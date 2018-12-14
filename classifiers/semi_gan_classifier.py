@@ -1,4 +1,5 @@
 """ Modified GAN semi-supervised learning MNIST classifier """
+import argparse
 from utils.misc import get_real_mnist, get_gan_mnist, plot_mist
 from utils.preprocessing import preprocess_raw_mnist_data
 import tensorflow as tf
@@ -45,7 +46,7 @@ def discriminator():
     return model
 
 
-def main(plot=False, train=False):
+def main(plot=False, train=False, epochs=5, unlabelled_size=5400):
     """ Main function """
     # Get mnist train and test dataset
     (x_train, y_train), (x_test, y_test) = get_real_mnist()
@@ -59,27 +60,22 @@ def main(plot=False, train=False):
     x_test = preprocess_raw_mnist_data(x_test, conv=True)
     x_gan_train = preprocess_raw_mnist_data(x_gan_train, conv=True)
 
-
     # Build modified discriminator
     discrim = discriminator()
 
-
-    epochs = 100
-
     # Combine real and synthetic data
     label_size = 5400
-    unlabeled_size = 5400
-    ratio = label_size / (label_size + unlabeled_size)
+    ratio = label_size / (label_size + unlabelled_size)
 
     if train:
         # Train classifier
         print('\ntrain the classifier')
 
-        x_comb_train = np.append(x_gan_train[:unlabeled_size], x_train[:label_size], axis=0)
+        x_comb_train = np.append(x_gan_train[:unlabelled_size], x_train[:label_size], axis=0)
         y_comb_train = [
-            np.append(np.zeros(unlabeled_size), np.ones(label_size), axis=0),
-            # We assign the label 10 to all unlabeled examples as the digit that represents a fake image.
-            np.append(np.zeros(unlabeled_size)+10, y_train[:label_size], axis=0)
+            np.append(np.zeros(unlabelled_size), np.ones(label_size), axis=0),
+            # We assign the label 10 to all unlabelled examples as the digit that represents a fake image.
+            np.append(np.zeros(unlabelled_size)+10, y_train[:label_size], axis=0)
         ]
 
         discrim.fit(x_comb_train, y_comb_train, epochs=epochs)
@@ -111,4 +107,31 @@ def main(plot=False, train=False):
 
 
 if __name__ == '__main__':
-    main()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--train", "-t", help="It specifies if you want to train the model first. (Default False)",
+                        action="store_true",
+                        dest='train')
+    parser.add_argument("--epochs",
+                        "-e",
+                        help=(
+                            "It specifies how many epochs to use for training the "
+                            "model or which corresponding save weights to use. (Default 5)"
+                        ),
+                        default='5',
+                        type=int,
+                        dest='epochs'
+                        )
+    parser.add_argument("--unlabelled_size",
+                        "-u",
+                        help=(
+                            "It allows you to specify how many unlabelled "
+                            "samples to run the training with. (Default 5400)."
+                            "N.B: Use it in combination with Training: -t"
+                        ),
+                        default=5400,
+                        choices=[5400, 0],
+                        type=int,
+                        dest='unlabelled_size'
+                        )
+    args = parser.parse_args()
+    main(train=args.train, epochs=args.epochs, unlabelled_size=args.unlabelled_size)
