@@ -1,4 +1,5 @@
 """ SoftMax MNIST classifier """
+import argparse
 from utils.misc import get_real_mnist, get_gan_mnist, plot_mist
 from utils.preprocessing import preprocess_raw_mnist_data
 import tensorflow as tf
@@ -22,7 +23,7 @@ def simple_soft_max_classifier():
     return classifier
 
 
-def main(plot=False, train=False):
+def main(plot=False, train=False, epochs=5):
     """ Main function """
     # Get mnist train and test dataset
     (x_train, y_train), (x_test, y_test) = get_real_mnist()
@@ -38,8 +39,6 @@ def main(plot=False, train=False):
 
     # Build classifier
     sm_clf = simple_soft_max_classifier()
-
-    epochs = 100
 
     if train:
         # Train classifier
@@ -94,4 +93,19 @@ def main(plot=False, train=False):
 
 
 if __name__ == '__main__':
-    main()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--train", "-t", help="It specifies if you want to train the model first. (Default False)",
+                        action="store_true",
+                        dest='train')
+    parser.add_argument("--epochs",
+                        "-e",
+                        help=(
+                            "It specifies how many epochs to use for training the "
+                            "model or which corresponding save weights to use. (Default 5)"
+                        ),
+                        default='5',
+                        type=int,
+                        dest='epochs'
+                        )
+    args = parser.parse_args()
+    main(train=args.train, epochs=args.epochs)
