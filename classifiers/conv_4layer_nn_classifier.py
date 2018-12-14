@@ -1,5 +1,6 @@
 """ Convolutional Neural Network MNIST classifier """
 import argparse
+from os import path, mkdir
 from utils.misc import get_real_mnist, get_gan_mnist, plot_mist
 from utils.preprocessing import preprocess_raw_mnist_data
 import tensorflow as tf
@@ -91,7 +92,9 @@ def attention_visualization(cnn_clf, x_test, y_test):
             ax[i+1].set_title(modifier)    
             ax[i+1].imshow(grads, cmap='jet')
 
-        # TODO make sure that output folder structure is correct
+        # make sure that output folder structure is correct
+        if not path.exists("output/attention_saliency"):
+            mkdir("output/attention_saliency")
         plt.savefig("output/attention_saliency/conv_4layer_multiple_modifiers_saliency_" + str(class_idx) + ".png")
         plt.show()
 
@@ -111,6 +114,8 @@ def attention_visualization(cnn_clf, x_test, y_test):
                 modifier = 'vanilla'
             ax[i+1].set_title(modifier)
             ax[i+1].imshow(grads, cmap='jet')
+        if not path.exists("output/attention_CAM"):
+            mkdir("output/attention_CAM")
         plt.savefig("output/attention_CAM/conv_4layer_multiple_modifiers_CAM_" + str(class_idx) + ".png")        
         plt.show()
 

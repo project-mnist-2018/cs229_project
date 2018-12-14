@@ -1,4 +1,6 @@
 """ Convolutional Neural Network MNIST classifier """
+import argparse
+from os import path, mkdir
 import itertools
 from utils.misc import get_real_mnist, get_gan_mnist, plot_mist
 from utils.preprocessing import preprocess_raw_mnist_data
@@ -9,6 +11,7 @@ from vis.visualization import visualize_saliency
 from vis.visualization import visualize_cam
 from vis.utils import utils
 from keras import activations
+from sklearn.metrics import confusion_matrix
 import numpy as np
 
 def cnn_classifier():
@@ -82,7 +85,8 @@ def attention_visualization(cnn_clf, x_test, y_test, epoch, img):
                 modifier = 'vanilla'
             ax[i+1].set_title(modifier)    
             ax[i+1].imshow(grads, cmap='jet')
-    
+        if not path.exists("output/attention_saliency"):
+            mkdir("output/attention_saliency")
         plt.savefig("output/attention_saliency/conv_5layer_" + img +"_epoch_" + str(epoch) + "_multiple_modifiers_saliency_" + str(class_idx) + ".png")        
         plt.show()
 
@@ -102,7 +106,9 @@ def attention_visualization(cnn_clf, x_test, y_test, epoch, img):
                 modifier = 'vanilla'
             ax[i+1].set_title(modifier)    
             ax[i+1].imshow(grads, cmap='jet')
-        plt.savefig("output/attention_CAM/conv_5layer_" + img + "_epoch_" + str(epoch) + "_multiple_modifiers_CAM_" + str(class_idx) + ".png")        
+        if not path.exists("output/attention_CAM"):
+            mkdir("output/attention_CAM")
+        plt.savefig("output/attention_CAM/conv_5layer_" + img + "_epoch_" + str(epoch) + "_multiple_modifiers_CAM_" + str(class_idx) + ".png")
         plt.show()
 
     #model summary
@@ -142,7 +148,8 @@ def plot_confusion_matrix(cm, classes,
     plt.xlabel('Predicted label')
     plt.tight_layout()
 
-def main(plot=False, train=False):
+
+def main(plot=False, train=False, epochs=5, attention=False, conf_matrix=False):
     """ Main function """
     # Get mnist train and test dataset
     (x_train, y_train), (x_test, y_test) = get_real_mnist()
@@ -159,8 +166,6 @@ def main(plot=False, train=False):
 
     # Build classifier
     cnn_clf = cnn_classifier()
-
-    epochs = 100
 
     if train:
         # Train classifier
@@ -217,46 +222,77 @@ def main(plot=False, train=False):
     print('Test loss gan:', test_loss)
     print('Test accuracy gan:', test_acc)
 
-    attention_visualization(cnn_clf, x_test[:1000], y_test[:1000], epochs, "real")
-    attention_visualization(cnn_clf, x_gan_test[:1000], y_gan_test[:1000], epochs, "synthetic")
+    if attention:
+        attention_visualization(cnn_clf, x_test[:1000], y_test[:1000], epochs, "real")
+        attention_visualization(cnn_clf, x_gan_test[:1000], y_gan_test[:1000], epochs, "synthetic")
 
-    from sklearn.metrics import confusion_matrix
+    if conf_matrix:
+        #Original predict returns 1 hot encoding, so use argmax instead
+        y_pred = np.argmax(cnn_clf.predict(x_test[:1000]), axis=1)
+        cm = confusion_matrix(y_test[:1000], y_pred)
+        class_names= [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 
-    #Original predict returns 1 hot encoding, so use argmax instead
-    y_pred = np.argmax(cnn_clf.predict(x_test[:1000]), axis=1)
-    cm = confusion_matrix(y_test[:1000], y_pred)
-    class_names= [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+        y_gan_pred = np.argmax(cnn_clf.predict(x_gan_test[:1000]), axis=1)
+        gan_cm = confusion_matrix(y_gan_test[:1000], y_gan_pred)
 
-    y_gan_pred = np.argmax(cnn_clf.predict(x_gan_test[:1000]), axis=1)
-    gan_cm = confusion_matrix(y_gan_test[:1000], y_gan_pred)
+        # Plot non-normalized confusion matrix
+        plt.figure()
+        plot_confusion_matrix(cm, classes=class_names,
+                              title='Confusion matrix real images, without normalization')
+        plt.savefig("output/confusion_matrix_real_cnn_5layer_epoch_" + str(epochs) + ".png")
 
-    # Plot non-normalized confusion matrix
-    plt.figure()
-    plot_confusion_matrix(cm, classes=class_names,
-                          title='Confusion matrix real images, without normalization')
-    plt.savefig("output/confusion_matrix_real_cnn_5layer_epoch_" + str(epochs) + ".png")
+        plt.figure()
+        plot_confusion_matrix(gan_cm, classes=class_names,
+                              title='Confusion matrix synthetic images, without normalization')
+        plt.savefig("output/confusion_matrix_synthetic_cnn_5layer_epoch_" + str(epochs) + ".png")
 
-    plt.figure()
-    plot_confusion_matrix(gan_cm, classes=class_names,
-                          title='Confusion matrix synthetic images, without normalization')
-    plt.savefig("output/confusion_matrix_synthetic_cnn_5layer_epoch_" + str(epochs) + ".png")
+        # Plot normalized confusion matrix
+        plt.figure()
+        plot_confusion_matrix(cm, classes=class_names, normalize=True,
+                              title='Normalized confusion matrix real images')
+        plt.savefig("output/confusion_matrix_real_normalized_cnn_5layer_epoch_" + str(epochs) + ".png")
 
-    # Plot normalized confusion matrix
-    plt.figure()
-    plot_confusion_matrix(cm, classes=class_names, normalize=True,
-                          title='Normalized confusion matrix real images')
-    plt.savefig("output/confusion_matrix_real_normalized_cnn_5layer_epoch_" + str(epochs) + ".png")
+        plt.figure()
+        plot_confusion_matrix(gan_cm, classes=class_names, normalize=True,
+                              title='Normalized confusion matrix synthetic images')
+        plt.savefig("output/confusion_matrix_synthetic_normalized_cnn_5layer_epoch_" + str(epochs) + ".png")
 
-    plt.figure()
-    plot_confusion_matrix(gan_cm, classes=class_names, normalize=True,
-                          title='Normalized confusion matrix synthetic images')
-    plt.savefig("output/confusion_matrix_synthetic_normalized_cnn_5layer_epoch_" + str(epochs) + ".png")
-
-    plt.show()
+        plt.show()
 
     if plot:
         plot_mist(x_train, y_train, 9, save_file_path='plots/test.png')
 
 
 if __name__ == '__main__':
-    main(train=False)
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--train", "-t", help="It specifies if you want to train the model first. (Default False)",
+                        action="store_true",
+                        dest='train')
+    parser.add_argument("--epochs",
+                        "-e",
+                        help=(
+                            "It specifies how many epochs to use for training the "
+                            "model or which corresponding save weights to use. (Default 5)"
+                        ),
+                        default='5',
+                        type=int,
+                        dest='epochs'
+                        )
+    parser.add_argument("--attention",
+                        "-a",
+                        help=(
+                            "It specifies if you want to plot the attention visualization at the end (Default False)"
+                        ),
+                        action="store_true",
+                        dest='attention'
+                        )
+    parser.add_argument("--conf_matrix",
+                        "-c",
+                        help=(
+                            "It specifies if you want to plot the confusion matrix at the end (Default False)"
+                        ),
+                        action="store_true",
+                        dest='conf_matrix'
+                        )
+    args = parser.parse_args()
+    main(train=args.train, epochs=args.epochs, attention=args.attention, conf_matrix=args.conf_matrix)
