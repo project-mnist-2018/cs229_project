@@ -224,12 +224,6 @@ def main(plot=False, train=False):
 
     #Original predict returns 1 hot encoding, so use argmax instead
     y_pred = np.argmax(cnn_clf.predict(x_test[:1000]), axis=1)
-    #y_pred = tf.argmax(cnn_clf.predict(x_test), axis=1)
-    #cm = tf.confusion_matrix(y_test, y_pred, num_classes=10)
-    
-    #sess = tf.Session()
-    #with sess.as_default():
-    #    print(sess.run(cm))
     cm = confusion_matrix(y_test[:1000], y_pred)
     class_names= [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 

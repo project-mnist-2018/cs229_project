@@ -57,12 +57,6 @@ def attention_visualization(cnn_clf, x_test, y_test):
     # pick some random input from here.
     idx = indices[0]
 
-    # Lets sanity check the picked image.
-    # plt.rcParams['figure.figsize'] = (18, 6)
-    # plt.imshow(x_test[idx][..., 0])
-    # plt.savefig("output/conv_4layer_input.png")
-    # plt.show()
-
     # Utility to search for layer index by name. 
     # Alternatively we can specify this as -1 since it corresponds to the last layer.
     layer_idx = utils.find_layer_idx(cnn_clf, 'preds')
@@ -72,21 +66,6 @@ def attention_visualization(cnn_clf, x_test, y_test):
     #Softmax is weird that way. It is the only activation that depends on other node output(s) in the layer
     cnn_clf.layers[layer_idx].activation = activations.linear
     model = utils.apply_modifications(cnn_clf)
-
-    #grads = visualize_saliency(model, layer_idx, filter_indices=class_idx, seed_input=x_test[idx])
-    # Plot with 'jet' colormap to visualize as a heatmap.
-    #plt.imshow(grads, cmap='jet')
-    #plt.savefig("output/conv_4layer_saliency.png")
-    #plt.show()
-
-    # for modifier in ['guided', 'relu']:
-    #     grads = visualize_saliency(model, layer_idx, filter_indices=class_idx,
-    #                                seed_input=x_test[idx], backprop_modifier=modifier)
-    #     plt.figure()
-    #     plt.title(modifier)
-    #     plt.imshow(grads, cmap='jet')
-    #     plt.savefig("output/conv_4layer_" + modifier + ".png")
-    #     plt.show()
 
     #Show negation
     grads = visualize_saliency(model, layer_idx, filter_indices=class_idx, seed_input=x_test[idx], 
