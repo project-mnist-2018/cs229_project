@@ -1,4 +1,5 @@
 """ Convolutional Neural Network MNIST classifier """
+import argparse
 from utils.misc import get_real_mnist, get_gan_mnist, plot_mist
 from utils.preprocessing import preprocess_raw_mnist_data
 import tensorflow as tf
@@ -117,7 +118,7 @@ def attention_visualization(cnn_clf, x_test, y_test):
     print(model.summary())
 
 
-def main(plot=False, train=False):
+def main(plot=False, train=False, epochs=5, attention=False):
     """ Main function """
     # Get mnist train and test dataset
     (x_train, y_train), (x_test, y_test) = get_real_mnist()
@@ -134,8 +135,6 @@ def main(plot=False, train=False):
 
     # Build classifier
     cnn_clf = cnn_classifier()
-
-    epochs = 100
 
     if train:
         # Train classifier
@@ -195,11 +194,35 @@ def main(plot=False, train=False):
     print('Test loss gan:', test_loss)
     print('Test accuracy gan:', test_acc)
 
-    attention_visualization(cnn_clf, x_test, y_test)
+    if attention:
+        attention_visualization(cnn_clf, x_test, y_test)
 
     if plot:
         plot_mist(x_train, y_train, 9, save_file_path='plots/test.png')
 
 
 if __name__ == '__main__':
-    main(train=False)
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--train", "-t", help="It specifies if you want to train the model first. (Default False)",
+                        action="store_true",
+                        dest='train')
+    parser.add_argument("--epochs",
+                        "-e",
+                        help=(
+                            "It specifies how many epochs to use for training the "
+                            "model or which corresponding save weights to use. (Default 5)"
+                        ),
+                        default='5',
+                        type=int,
+                        dest='epochs'
+                        )
+    parser.add_argument("--attention",
+                        "-a",
+                        help=(
+                            "It specifies if you want to plot the attention visualization at the end (Default False)"
+                        ),
+                        action="store_true",
+                        dest='attention'
+                        )
+    args = parser.parse_args()
+    main(train=args.train, epochs=args.epochs, attention=args.attention)
