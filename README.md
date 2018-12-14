@@ -33,6 +33,12 @@ cd classifiers
 python [classifier file to test]
 ```
 
+To see the config for how to run the test:
+
+```
+python [classifier file] -h
+```
+
 ## Authors
 
 * **Riccardo Verzeni**
